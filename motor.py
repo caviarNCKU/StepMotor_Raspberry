@@ -1,22 +1,18 @@
 import RPi.GPIO as GPIO
 import time
 
-GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
 
-pin1 = 14
-pin2 = 15
-pin3 = 17
-pin4 = 18
-pin5 = 23
+pin = [29,31,33,35]
 
-GPIO.setup(pin1,GPIO.OUT)
-GPIO.setup(pin2,GPIO.OUT)
-GPIO.setup(pin3,GPIO.OUT)
-GPIO.setup(pin4,GPIO.OUT)
-GPIO.setup(pin5,GPIO.IN)
+for i in range(4):
+	gpio.setup(pin[i],GPIO.OUT)
 
-forward_seq = ['1010', '0110', '0101', '1001']
-reverse_seq = ['1001', '0101', '0110', '1010']
+#GPIO.setup(pin5,GPIO.IN)
+
+forward_seq = ['0011', '1001', '1100', '0110']
+reverse_seq = ['0110', '1100', '1001', '0011']
 
 def forward(delay,steps):
 	for i in range(steps):
@@ -31,22 +27,24 @@ def reverse(delay,steps):
 			print(step)
 			time.sleep(delay)
 def set_step(step):
-		GPIO.output(pin1, step[0] == '1');
-		GPIO.output(pin2, step[1] == '1');
-		GPIO.output(pin3, step[2] == '1');
-		GPIO.output(pin4, step[3] == '1');
+	for i in range(4):
+		GPIO.output(pin[i], step[i] == '1');
 while True:
-#	select = raw_input("Select:")
-#	if select == 'A' or select == 'a':
-	input = GPIO.input(pin5)
-	if input:
+	select = raw_input("Select:")
+	if select == 'A' or select == 'a':
+#	input = GPIO.input(pin5)
+#	if prev_input == 0 and input == 1:
 		set_step('0000')
 		print("2 steps forward, delay 10 milliseceonds")
-		forward(int(10) / 1000.0 , int(2))
+		forward(0.01, int(720))
 		prev_input = input;
-	elif prev_input == 1 and input == 0:
+	elif select == 'B' or select == 'b':
+#	elif prev_input == 1 and input == 0:
 		set_step('0000')
 		print("2 steps reverse, delay 10 milliseceonds")
-		reverse(int(10) / 1000.0, int (2))
+		reverse(0.01, int (720))
 		prev_input = 0;
+	else:
+		GPIO.cleanup()
+		exit();
 
